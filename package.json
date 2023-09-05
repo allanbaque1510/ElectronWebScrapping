@@ -2,8 +2,9 @@
   "name": "electronapp",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/main.js",
   "scripts": {
+    "dev": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -11,5 +12,9 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "^26.1.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "puppeteer": "^21.1.1"
   }
 }

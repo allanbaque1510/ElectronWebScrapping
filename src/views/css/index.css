@@ -1,0 +1,98 @@
+
+body{
+    padding: 0;
+    margin: 0;
+    background-color: rgb(22, 20, 41);
+    color: white;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+#miFormulario{
+    width: 100%;
+    height: 40px;
+    display: flex;
+    position: fixed;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center;
+}
+.inputNombre{
+    padding: 3px;
+    font-size: 20px;
+    border-radius: 10px; 
+    background-color: rgba(48, 47, 59, 0.61);
+    border: 1px solid gray;
+    outline: none;
+    color: white;
+
+    margin-inline: 10px;
+
+}
+.botonNombre{
+    margin-inline: 10px;
+    padding-block: 4px;
+    color: white;
+    padding-inline: 30px;
+    background-color: rgb(28, 84, 121);
+    font-size: 20px;
+    border: none;
+    outline: none;
+}
+.contenedorFlex{
+    padding-top: 40px;
+    display: flex;
+}
+.informacion{
+    min-width: 50%;
+    flex: 1;
+    background-color: aquamarine;
+    padding: 10px;
+}
+#resultados{
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 600px;
+    justify-items: center;
+    overflow: auto;
+}
+.item{
+    width: 150px;
+    padding: 5px;
+    background-color: rgb(26, 23, 56);
+    margin: 3px;
+    border-radius: 10px;
+}
+.item a{
+    text-decoration: none;
+}
+.datos{
+    margin-top: 15px ;
+}
+.item p {
+    font-size: large;
+    padding: 0;
+    margin: 0;
+    color: white;
+}
+.item img{
+    height: 300px;
+}
+.contImg{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    width: 150px;
+}
+.tipo{
+    border-radius: 10px;
+    padding-block: 2px;
+    padding-inline: 4px;
+    color: white;
+    background-color: rgb(185, 80, 31);
+}
+.estado{
+    border-radius: 10px;
+    padding-block: 2px;
+    padding-inline: 4px;
+    color: white;
+    background-color: rgb(31, 85, 185);
+}
