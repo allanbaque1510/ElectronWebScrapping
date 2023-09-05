@@ -19,9 +19,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   const prueba = (id) => {
+
+      Swal.fire({
+        title: 'Buscando lista de animes',
+        allowOutsideClick:false,
+        didOpen: () => {
+          Swal.showLoading()
+        },
+        willClose: () => {
+         
+        }
+      })
+    
     fetch(`http://localhost:3000/api/${id}`)
       .then((response) => response.json())
       .then((data) => {
+        Swal.close();
         // Obtén una referencia al elemento <div> donde deseas mostrar los resultados
         const resultadosDiv = document.getElementById('resultados');
         console.log(data)
@@ -29,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const contenidoHTML = data.map((objeto) => {
           return `
             <div class='item' >
-              <a href='${objeto.link}'>
+              <button class='tarjetaBtn' onclick="infoAnime('${objeto.link}')">
               <div class='contImg'>
                 <img src="${objeto.imagen}" alt="${objeto.titulo}">
               </div>
@@ -38,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class='estado'>${objeto.estado}</span>
                 <p>${objeto.titulo}</p>
               </div>
-              </a>
+              </button>
             </div>
           `;
         }).join(''); // Une las cadenas HTML en una sola
@@ -47,6 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
         resultadosDiv.innerHTML = contenidoHTML;
       })
       .catch((error) => {
-        console.error('Error:', error);
+        console.log(error)
+        Swal.fire({
+          icon: 'error',
+          title: 'Ah ocurrido un error',
+          text: error
+        })
       });
   };

@@ -1,4 +1,4 @@
-const { app, BrowserWindow,ipcMain  } = require('electron');
+const { app, BrowserWindow  } = require('electron');
 const express = require('express');
 const puppeteer = require('puppeteer');
 
@@ -6,7 +6,7 @@ const expressApp = express();
 
 const createWindow = () => {
   const win = new BrowserWindow({
-    width: 800,
+    width: 900,
     height: 600,
   })
   win.loadFile('src/views/index.html')
