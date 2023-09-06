@@ -15,20 +15,18 @@
     </form>
   </div>
   <div class="contenedorFlex">
-    <div id="resultados"></div>
-
-    <div class="informacion">
-      <div class="contenidoInfo"></div>
+    <div id="listItems" class="listItems">
+      <div id="resultados"></div>
+      <div id="navegacion"></div>
+    </div>
+    <div  class="informacion">
+      <div id="informacion" class="contenidoInfo"></div>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script  src="js/index.js"></script>
     <script>
-      function infoAnime(url){
-        document.getElementById('resultados').classList.add('showInfoResult')
-        document.getElementsByClassName('informacion').classList.add('showInfo')
-        console.log(url)
-      }
+      
     </script>
 </body>
 </html>
