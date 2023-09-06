@@ -15,7 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   const prueba = (id) => {
-
+    document.getElementById('navegacion').classList.remove('ocultar')
+    document.getElementById('listItems').classList.remove('showInfoResult')
+    const divInfo = document.getElementById('informacion');
+    const contenidoHTML =``
+    divInfo.innerHTML =contenidoHTML
       Swal.fire({
         title: 'Buscando lista de animes',
         allowOutsideClick:false,
@@ -75,11 +79,90 @@ document.addEventListener('DOMContentLoaded', () => {
         })
       });
   };
+
   function infoAnime(url){
+    document.getElementById('navegacion').classList.remove('ocultar')
+
     document.getElementById('listItems').classList.add('showInfoResult')
-    document.getElementById('informacion').classList.add('showInfo')
+    const divInfo = document.getElementById('informacion');
+    const contenidoHTML =`Cargando datos....`
+    divInfo.innerHTML =contenidoHTML
     searchInfo(url)
   }
+
+
+  function verEpisodio(url){
+    const resultadosDiv = document.getElementById('divPantalla');
+    resultadosDiv.innerHTML='Cargando pantalla....'
+    fetch(`http://localhost:3000/api/verEpisodio`,{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({valor:url}),
+    }).then((response) => response.json())
+    .then((data) => {
+      const contenidoHTML = `
+        <div>
+          <h3>${data.titulo}</h3>
+          <video class='video' controls autoplay name="media" crossorigin="anonymous" >
+            <source src='${data.video}' type='video/mp4'>
+          </video>
+        </div>
+      `
+      resultadosDiv.innerHTML=contenidoHTML
+    })
+  }
+
+
+
+  function verCapitulos(url){
+    const resultadosDiv = document.getElementById('resultados');
+    resultadosDiv.innerHTML='Cargando episodios....'
+
+    document.getElementById('navegacion').classList.add('ocultar')
+    fetch(`http://localhost:3000/api/ver`,{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({valor:url}),
+    }).then((response) => response.json())
+    .then((data) => {
+      const contenidoHTML = `
+      <div class='contEpi scrollBar'>
+        <div class='episodeList scrollBar'>${data.episodios.map((episodio)=>{
+          return `<div class='episodio' onclick=verEpisodio('${episodio.link}')>
+                    <img src='${episodio.imagen}'>
+                    <span>${episodio.titulo}</span>
+                  </div>`
+            }).join('')}
+            </div>
+            <div id='divPantalla' class='watch'>
+            <button onclick=descargarAnimes('${data.episodios.map((epi)=>{
+              return `${epi.link}`
+            })}')>Descargar lista de episodios</button>
+            </div>
+      </div>
+      `
+
+      resultadosDiv.innerHTML=contenidoHTML
+    })
+  }
+  async function descargarAnimes(datos) {
+    const arreglo = datos.split(",");
+
+    fetch(`http://localhost:3000/api/descargar`,{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({valor:arreglo}),
+    }).then((response) => response.json())
+    .then((data) => {
+      console.log(data)
+    })
+}
   async function searchInfo(url){
 
     fetch(`http://localhost:3000/api/info`,{
@@ -91,19 +174,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }).then((response) => response.json())
     .then((data) => {
     
-      console.log(data) 
       const divInfo = document.getElementById('informacion');
       // Utiliza plantillas de JavaScript para construir el contenido HTML
       const contenidoHTML =`
-          <div >
-          
-              <h3>${data.titulo}</h3>
+          <div style='height:100%;background-image:linear-gradient(to left, rgba(22, 20, 41, 1), rgba(22, 20, 41, 0)), linear-gradient(to right, rgba(22, 20, 41, 1), rgba(22, 20, 41, 0)), linear-gradient(rgba(0, 0, 0, 0),rgba(0, 0, 0, 0)), linear-gradient(rgba(22, 20, 41, 0.5), rgba(22, 20, 41, 1)), url(${data.imagen}); background-size: cover; background-position: center;' >
+              <h3 style='text-align:center'>${data.titulo}</h3>
               <p>${data.resumen}</p>
-              <p >${data.emitido}</p>
-              <p>${data.episodios}</p>
+              <p ><b>Emitido: </b> ${data.emitido}</p>
+              <p><b>Episodios: </b>${data.episodios}</p>
               ${data.genero.map((gen)=>{
-                `<a href='${gen.link}'>${gen.tipo}</a>`
+                return `<button class='tagsBtn' onclick=prueba('${gen.link}')>${gen.tipo}</button>`
               })}
+              <h4>Lista de episodios:</h4>
+         
+                ${data.paginacion.map((paginas)=>{
+                  return `<button onclick=verCapitulos('${paginas.referencia}')>
+                    ${paginas.titulo}
+                  </button>`
+                })}
+           
        
           </div>
         `;
