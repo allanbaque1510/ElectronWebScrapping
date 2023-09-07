@@ -1,11 +1,13 @@
 {
   "name": "otakulo",
+  "productName": "Otakulo",
   "version": "1.0.0",
   "description": "",
   "main": "src/main.js",
   "scripts": {
     "dev": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package-win": "electron-packager . --platform=win32 --arch=x64 --icon=./src/icono.png --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Otakulo\""
   },
   "icon": "./src/icono.png",
   "keywords": [],

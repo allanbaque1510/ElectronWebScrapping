@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   
   <link rel="stylesheet" type="text/css" href="css/index.css">
     <title>Otakulo</title>
 </head>
@@ -38,6 +37,7 @@
         }
       })
       if(!estado){
+        Swal.close()
         Swal.fire({
             position: 'top-end',
             icon: 'success',
