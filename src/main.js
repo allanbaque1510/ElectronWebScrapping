@@ -4,6 +4,7 @@ const puppeteer = require('puppeteer');
 const expressApp = express(); 
 const fs = require('fs');
 const axios = require('axios');
+const path = require('path');
 
 expressApp.use(express.json());
 let win;
@@ -12,6 +13,7 @@ app.whenReady().then(() => {
     win = new BrowserWindow({
     width: 900,
     height: 600,
+    icon: path.join(__dirname, 'icono.png'),
     webPreferences:{
       nodeIntegration:true,
       contextIsolation:false,

@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function verEpisodio(url){
     const resultadosDiv = document.getElementById('divPantalla');
+    console.log(url)
     resultadosDiv.innerHTML='Cargando pantalla....'
     fetch(`http://localhost:3000/api/verEpisodio`,{
       method: 'POST',
@@ -120,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultadosDiv = document.getElementById('resultados');
     resultadosDiv.innerHTML='Cargando episodios....'
     const tituloAnimeTexto = document.getElementById('tituloAnime').innerText +'_'+titulo;
-    console.log('Titulo del anime:'+tituloAnimeTexto)
     document.getElementById('navegacion').classList.add('ocultar')
     fetch(`http://localhost:3000/api/ver`,{
       method: 'POST',
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const contenidoHTML = `
       <div class='contEpi scrollBar'>
         <div class='episodeList scrollBar'>${data.episodios.map((episodio)=>{
-          return `<div class='episodio' onclick=verEpisodio('${episodio.capitulo}')>
+          return `<div class='episodio' onclick=verEpisodio('${episodio.link}')>
                     <img src='${episodio.imagen}'>
                     <span>${episodio.titulo}</span>
                   </div>`
@@ -196,10 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({valor:respuestas, titulo:tituloAnime}),
       }).then((response) => response.json())
       .then((data) => {
-
-
         console.log(data)
-
       })
     })
     .catch((error) => {
