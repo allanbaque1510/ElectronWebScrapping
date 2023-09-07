@@ -1,10 +1,21 @@
 const { app, BrowserWindow  } = require('electron');
 const express = require('express');
 const puppeteer = require('puppeteer');
-const EventEmitter = require('events');
 const expressApp = express(); 
+const axios = require('axios');
+const archiver = require('archiver');
+const fs = require('fs');
+const path = require('path');
+
 expressApp.use(express.json());
 
+// Directorio de salida para los archivos descargados
+const outputDirectory = './descargas';
+
+// Crear el directorio de salida si no existe
+if (!fs.existsSync(outputDirectory)) {
+  fs.mkdirSync(outputDirectory);
+}
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -175,34 +186,27 @@ const verEpisodio = async (idBusqueda) => {
 };
 
 
-const descargarEpisodio = async (urls) => {
-  const browser = await puppeteer.launch({headless:'new'})
-  const resultados = [];
-  for (const url of urls) {
+const descargarEpisodio = async (urlBusqueda) => {
+  try {
+    const browser = await puppeteer.launch({headless:'new'})
     const page = await browser.newPage();
-    await page.goto(url);
-    
-    // Buscar el iframe por su clase "player_conte"
-    const iframeHandle = await page.$('.player_conte');
+    await page.goto(urlBusqueda);  
     const result = await page.evaluate(async()=>{
+      const resultadoJSON = {};
       const titulo =  document.querySelector('h1').innerText;
-      return titulo
+      const capitulo =  document.querySelector('#guardar-capitulo').getAttribute('data-capitulo');
+
+      resultadoJSON.titulo = titulo
+      resultadoJSON.capitulo = capitulo
+      return resultadoJSON
     })
-    if (iframeHandle) {
-      const iframe = await iframeHandle.contentFrame();
-      await page.waitForSelector('video');
-      const videoElement = await iframe.$('video');
-      if (videoElement) {
-        // Hacer algo con la etiqueta video, por ejemplo, obtener su atributo src
-        const video = await iframe.evaluate(video => video.getAttribute('src'), videoElement);
-        resultados.push({result,video});
-        
-      } 
-    }
+    await browser.close();
+    return result
+  }catch (error) {
+    console.log(error)   
   }
-  await browser.close();
-  return {resultados}
 };
+
 
 
 
@@ -229,11 +233,15 @@ expressApp.post('/api/verEpisodio', async(req, res) => {
 });
 expressApp.post('/api/descargar', async(req, res) => {
   const {valor} = req.body;
-  const arrayData= await descargarEpisodio(valor)
-  console.log(arrayData)
-  res.json(arrayData);
+  const datos= await descargarEpisodio(valor)
+  res.json(datos);
 });
 
+expressApp.post('/api/download', async(req, res) => {
+  const {valor,titulo} = req.body;
+  console.log(titulo)
+  res.json(valor)
+});
 app.whenReady().then(() => {
   createWindow()
   

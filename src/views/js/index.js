@@ -116,10 +116,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-  function verCapitulos(url){
+  function verCapitulos(url,titulo){
     const resultadosDiv = document.getElementById('resultados');
     resultadosDiv.innerHTML='Cargando episodios....'
-
+    const tituloAnimeTexto = document.getElementById('tituloAnime').innerText + titulo;
+    console.log('Titulo del anime:'+tituloAnimeTexto)
     document.getElementById('navegacion').classList.add('ocultar')
     fetch(`http://localhost:3000/api/ver`,{
       method: 'POST',
@@ -129,17 +130,19 @@ document.addEventListener('DOMContentLoaded', () => {
       body: JSON.stringify({valor:url}),
     }).then((response) => response.json())
     .then((data) => {
+      console.log(data)
       const contenidoHTML = `
       <div class='contEpi scrollBar'>
         <div class='episodeList scrollBar'>${data.episodios.map((episodio)=>{
-          return `<div class='episodio' onclick=verEpisodio('${episodio.link}')>
+          return `<div class='episodio' onclick=verEpisodio('${episodio.capitulo}')>
                     <img src='${episodio.imagen}'>
                     <span>${episodio.titulo}</span>
                   </div>`
             }).join('')}
             </div>
             <div id='divPantalla' class='watch'>
-            <button onclick=descargarAnimes('${data.episodios.map((epi)=>{
+            <h3 id='tituloLista'>${tituloAnimeTexto}</h3>
+            <button onclick=descargarDatos('${data.episodios.map((epi)=>{
               return `${epi.link}`
             })}')>Descargar lista de episodios</button>
             </div>
@@ -149,20 +152,56 @@ document.addEventListener('DOMContentLoaded', () => {
       resultadosDiv.innerHTML=contenidoHTML
     })
   }
+  
   async function descargarAnimes(datos) {
     const arreglo = datos.split(",");
-
-    fetch(`http://localhost:3000/api/descargar`,{
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({valor:arreglo}),
-    }).then((response) => response.json())
-    .then((data) => {
-      console.log(data)
+    const resultados = [];
+    // Utilizamos Promise.all() para esperar todas las solicitudes GET
+    await Promise.all(
+      arreglo.map(async (urlData) => {
+        try {
+          const response = await fetch(`http://localhost:3000/api/descargar`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ valor: urlData}),
+          });
+  
+          const data = await response.json();
+          const capituloResponse = await fetch(`https://jkanime.net/ajax/download_episode/${data.capitulo}`, {
+            method: 'GET'
+          });
+  
+          const capituloData = await capituloResponse.json();
+          resultados.push(capituloData); // Agregar datos a la lista
+        }catch (error) {
+          console.error('Hubo un error:', error);
+        }
+      })
+    );
+    return resultados; // Devuelve la lista de respuestas
+  }
+  async function descargarDatos(datos){
+    const tituloAnime = document.getElementById('tituloLista').innerText;
+    descargarAnimes(datos)
+    .then((respuestas) => {
+      fetch(`http://localhost:3000/api/download`,{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({valor:respuestas, titulo:tituloAnime}),
+      }).then((response) => response.json())
+      .then((data) => {
+        console.log(data)
+      })
     })
-}
+    .catch((error) => {
+      console.error("Error en la descarga de animes:", error);
+    });
+  }
+  
   async function searchInfo(url){
 
     fetch(`http://localhost:3000/api/info`,{
@@ -178,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Utiliza plantillas de JavaScript para construir el contenido HTML
       const contenidoHTML =`
           <div style='height:100%;background-image:linear-gradient(to left, rgba(22, 20, 41, 1), rgba(22, 20, 41, 0)), linear-gradient(to right, rgba(22, 20, 41, 1), rgba(22, 20, 41, 0)), linear-gradient(rgba(0, 0, 0, 0),rgba(0, 0, 0, 0)), linear-gradient(rgba(22, 20, 41, 0.5), rgba(22, 20, 41, 1)), url(${data.imagen}); background-size: cover; background-position: center;' >
-              <h3 style='text-align:center'>${data.titulo}</h3>
+              <h3 id='tituloAnime' style='text-align:center'>${data.titulo}</h3>
               <p>${data.resumen}</p>
               <p ><b>Emitido: </b> ${data.emitido}</p>
               <p><b>Episodios: </b>${data.episodios}</p>
@@ -188,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <h4>Lista de episodios:</h4>
          
                 ${data.paginacion.map((paginas)=>{
-                  return `<button onclick=verCapitulos('${paginas.referencia}')>
+                  return `<button onclick="verCapitulos('${paginas.referencia}','${paginas.titulo}')">
                     ${paginas.titulo}
                   </button>`
                 })}
