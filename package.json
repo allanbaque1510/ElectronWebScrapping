@@ -1,5 +1,5 @@
 {
-  "name": "electronapp",
+  "name": "otakulo",
   "version": "1.0.0",
   "description": "",
   "main": "src/main.js",
@@ -7,6 +7,7 @@
     "dev": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "icon": "./src/icono.png",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -16,7 +17,10 @@
   "dependencies": {
     "archiver": "^6.0.1",
     "axios": "^1.5.0",
+    "electron-packager": "^17.1.2",
     "express": "^4.18.2",
+    "fs": "^0.0.1-security",
+    "jszip": "^3.10.1",
     "puppeteer": "^21.1.1"
   }
 }

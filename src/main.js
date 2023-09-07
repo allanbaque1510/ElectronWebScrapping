@@ -1,29 +1,33 @@
-const { app, BrowserWindow  } = require('electron');
+const { app, BrowserWindow,ipcMain, ipcRenderer } = require('electron');
 const express = require('express');
 const puppeteer = require('puppeteer');
 const expressApp = express(); 
-const axios = require('axios');
-const archiver = require('archiver');
 const fs = require('fs');
-const path = require('path');
+const axios = require('axios');
 
 expressApp.use(express.json());
+let win;
 
+app.whenReady().then(() => {
+    win = new BrowserWindow({
+    width: 900,
+    height: 600,
+    webPreferences:{
+      nodeIntegration:true,
+      contextIsolation:false,
+    }
+  })
+  win.loadFile('src/views/index.html')
+
+  
+  coneccion()
+})
 // Directorio de salida para los archivos descargados
 const outputDirectory = './descargas';
 
 // Crear el directorio de salida si no existe
 if (!fs.existsSync(outputDirectory)) {
   fs.mkdirSync(outputDirectory);
-}
-
-const createWindow = () => {
-  const win = new BrowserWindow({
-    width: 900,
-    height: 600,
-  })
-  win.loadFile('src/views/index.html')
-  win.webContents.openDevTools();
 }
 
 const coneccion = ()=>{
@@ -188,6 +192,8 @@ const verEpisodio = async (idBusqueda) => {
 
 const descargarEpisodio = async (urlBusqueda) => {
   try {
+  win.webContents.send('dataServe',{ progress:'', fileName:urlBusqueda ,estado:true,titulo:'Obteniendo datos'})
+
     const browser = await puppeteer.launch({headless:'new'})
     const page = await browser.newPage();
     await page.goto(urlBusqueda);  
@@ -207,9 +213,19 @@ const descargarEpisodio = async (urlBusqueda) => {
   }
 };
 
+// Función para descargar un video
+async function downloadVideo(videoUrl, savePath) {
+  const response = await axios.get(videoUrl, { responseType: 'stream' });
+  const writer = fs.createWriteStream(savePath);
 
+  response.data.pipe(writer);
 
+  return new Promise((resolve, reject) => {
+    writer.on('finish', resolve);
+    writer.on('error', reject);
+  });
 
+}
 expressApp.post('/api/buscar', async(req, res) => {
   const {valor} = req.body;
   const datos = await animeList(valor)
@@ -239,11 +255,30 @@ expressApp.post('/api/descargar', async(req, res) => {
 
 expressApp.post('/api/download', async(req, res) => {
   const {valor,titulo} = req.body;
-  console.log(titulo)
-  res.json(valor)
-});
-app.whenReady().then(() => {
-  createWindow()
+  const saveDirectory = './descargas/'+titulo;
+  try {
+    // Crear la carpeta de descargas si no existe
+    if (!fs.existsSync(saveDirectory)) {
+      fs.mkdirSync(saveDirectory);
+    }
+
+    for (let i = 0; i < valor.length; i++) {
+      const video = valor[i];
+      const videoUrl = video.url;
+      const videoName = video.nombre;
+      const savePath = (`${saveDirectory+'/'+videoName}`);
+      await downloadVideo(videoUrl, savePath);
+      const progress = Math.floor(((i + 1) / valor.length) * 100);
   
-  coneccion()
-})
+      win.webContents.send('dataServe',{ progress:`${progress}%`, fileName: videoName,estado:true,titulo:'Descargando...'})
+
+    }
+    win.webContents.send('dataServe',{ progress:'', fileName: '',estado:false,titulo:'Descarga Completa'})
+    res.json({ success: true });
+
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'Error al descargar los videos: ' + error.message });
+  }
+});
+
+

@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function verCapitulos(url,titulo){
     const resultadosDiv = document.getElementById('resultados');
     resultadosDiv.innerHTML='Cargando episodios....'
-    const tituloAnimeTexto = document.getElementById('tituloAnime').innerText + titulo;
+    const tituloAnimeTexto = document.getElementById('tituloAnime').innerText +'_'+titulo;
     console.log('Titulo del anime:'+tituloAnimeTexto)
     document.getElementById('navegacion').classList.add('ocultar')
     fetch(`http://localhost:3000/api/ver`,{
@@ -142,9 +142,9 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div id='divPantalla' class='watch'>
             <h3 id='tituloLista'>${tituloAnimeTexto}</h3>
-            <button onclick=descargarDatos('${data.episodios.map((epi)=>{
+            <button class='btnDescargar' onclick=descargarDatos('${data.episodios.map((epi)=>{
               return `${epi.link}`
-            })}')>Descargar lista de episodios</button>
+            })}')>Descargar lista de capitulos <img width="25" height="25" src="https://img.icons8.com/metro/26/FFFFFF/download--v1.png" alt="download--v1"></button>
             </div>
       </div>
       `
@@ -182,10 +182,12 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     return resultados; // Devuelve la lista de respuestas
   }
+  
   async function descargarDatos(datos){
     const tituloAnime = document.getElementById('tituloLista').innerText;
     descargarAnimes(datos)
     .then((respuestas) => {
+      
       fetch(`http://localhost:3000/api/download`,{
         method: 'POST',
         headers: {
@@ -194,7 +196,10 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({valor:respuestas, titulo:tituloAnime}),
       }).then((response) => response.json())
       .then((data) => {
+
+
         console.log(data)
+
       })
     })
     .catch((error) => {
@@ -227,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <h4>Lista de episodios:</h4>
          
                 ${data.paginacion.map((paginas)=>{
-                  return `<button onclick="verCapitulos('${paginas.referencia}','${paginas.titulo}')">
+                  return `<button class='tagCap' onclick="verCapitulos('${paginas.referencia}','${paginas.titulo}')">
                     ${paginas.titulo}
                   </button>`
                 })}

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
    
   <link rel="stylesheet" type="text/css" href="css/index.css">
-    <title>Titulo</title>
+    <title>Otakulo</title>
 </head>
 <body>
   <div class="formulario">
@@ -23,10 +23,35 @@
       <div id="informacion"  class="contenidoInfo scrollBar"></div>
     </div>
   </div>
+  <script>
+    const {ipcRenderer}= require('electron')
+    ipcRenderer.on('dataServe',(event,{ progress, fileName, estado,titulo })=>{
+      Swal.fire({
+        title: titulo,
+        html: `${fileName} <br> ${progress}`,
+        allowOutsideClick:false,
+        didOpen: () => {
+          Swal.showLoading()
+        },
+        willClose: () => {
+         
+        }
+      })
+      if(!estado){
+        Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: 'Descarga exitosa',
+            showConfirmButton: false,
+            timer: 1500
+          })
+      } 
+        
+    })
+  </script>
+  
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script  src="js/index.js"></script>
-    <script>
-      
-    </script>
+
 </body>
 </html>
