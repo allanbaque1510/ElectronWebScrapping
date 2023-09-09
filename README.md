@@ -4,7 +4,7 @@
 
 - Para instalar el proyecto se debe tener la libreria puppeteer de nodejs instalada globalmente con el comando:
 
->npm install -g puppeter
+>npm install -g puppeteer
 
 - Despues se debe activar el firewall para que conceda permisos a la aplicacion en la red local y publica.
 
