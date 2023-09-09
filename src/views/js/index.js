@@ -33,7 +33,7 @@ const datosInicio = () =>{
     .then((data) => {
       console.log(data)
       const contenidoHTML =`
-      <h2 style='width:100%;'>Top Animes!!!</h2>
+      <h3 style='width:100%;'>Top Animes!!!</h3>
       <div class='col1'>
         <div class='top1' onclick="infoAnime('${data.top1.link}')">
           <span>${data.top1.top}</span>
@@ -65,7 +65,7 @@ const datosInicio = () =>{
       </div>
       </div>
       <div class='trendList'>
-        <h2 style='width:100%'>Ultimas Novedades</h2>
+        <h3 style='width:100%'>Ultimas Novedades</h3>
         ${
           data.trend.map((objeto) => {
             return `

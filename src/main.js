@@ -12,6 +12,13 @@ let win;
 ipcMain.on('cerrarVentana',(evento)=>{
   app.quit();
 })
+ipcMain.on('recargar',(evento)=>{
+  const ventana = BrowserWindow.getFocusedWindow();
+  // Recargar la ventana actual
+  if (ventana) {
+    ventana.reload();
+  }
+})
 ipcMain.on('minVentana',(evento)=>{
   const ventana = BrowserWindow.getFocusedWindow();
 
@@ -35,7 +42,7 @@ app.whenReady().then(() => {
     width: 900,
     height: 600,
     frame: false,
-    icon: path.join(__dirname, 'icono.png'),
+    icon: path.join(__dirname, 'icono.ico'),
     webPreferences:{
       nodeIntegration:true,
       contextIsolation:false,
