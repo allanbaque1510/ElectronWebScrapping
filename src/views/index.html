@@ -8,10 +8,17 @@
 </head>
 <body>
   <div class="formulario">
+    <div class="">Inicio</div>
     <form id="miFormulario">
       <input class="inputNombre" type="text" required id="nombre" placeholder="Nombre del anime" name="nombre"><br><br>
       <button class="botonNombre" type="submit">Enviar</button>  
     </form>
+    <div class="botonesW">
+      <button onclick="minVentana()"><img width="30" height="30" src="https://img.icons8.com/ios-filled/50/FFFFFF/minimize-window.png" alt="minimize-window"/></button>
+      <button onclick="maxVentana()"><img width="30" height="30" src="https://img.icons8.com/ios-filled/40/FFFFFF/maximize-window.png" alt="maximize-window"/></button>
+      <button onclick="cerrarVentana()"><img width="30" height="30" src="https://img.icons8.com/ios-filled/50/FFFFFF/close-window.png" alt="external-Close-antivirus-flat-icons-inmotus-design"/></button>
+    </div>
+
   </div>
   <div class="contenedorFlex">
     <div id="listItems" class="listItems">
@@ -24,6 +31,22 @@
   </div>
   <script>
     const {ipcRenderer}= require('electron')
+    function cerrarVentana() {
+      ipcRenderer.send('cerrarVentana','Cerrar Electron xd')
+    }
+    function minVentana() {
+      ipcRenderer.send('minVentana','minimizar Electron xd')
+    }
+    function maxVentana() {
+      ipcRenderer.send('maxVentana','maximizar Electron xd')
+    }
+    ipcRenderer.on('dataError',(event,{ error,titulo })=>{
+      Swal.fire({
+          icon: 'error',
+          title: titulo,
+          text: error,
+        })
+    })
     ipcRenderer.on('dataServe',(event,{ progress, fileName, estado,titulo })=>{
       Swal.fire({
         title: titulo,

@@ -9,10 +9,32 @@ const path = require('path');
 expressApp.use(express.json());
 let win;
 
+ipcMain.on('cerrarVentana',(evento)=>{
+  app.quit();
+})
+ipcMain.on('minVentana',(evento)=>{
+  const ventana = BrowserWindow.getFocusedWindow();
+
+  // Maximizar la ventana
+  if (ventana) {
+    ventana.minimize();
+  }
+})
+ipcMain.on('maxVentana',(evento)=>{
+  const ventana = BrowserWindow.getFocusedWindow();
+
+  // Maximizar la ventana
+  if (ventana.isMaximized()) {
+    ventana.unmaximize();
+  }else{
+    ventana.maximize();
+  }
+})
 app.whenReady().then(() => {
     win = new BrowserWindow({
     width: 900,
     height: 600,
+    frame: false,
     icon: path.join(__dirname, 'icono.png'),
     webPreferences:{
       nodeIntegration:true,
@@ -40,6 +62,7 @@ const coneccion = ()=>{
 }
 
 const animeList = async (idBusqueda) => {
+  try {
   const browser = await puppeteer.launch({headless:'new'})
   const page = await browser.newPage();
   if(idBusqueda.includes('https://jkanime.net/')){
@@ -76,9 +99,13 @@ const animeList = async (idBusqueda) => {
     })
     resultadoJSON.Animes = datos
     return resultadoJSON
-})
-await browser.close();
-return result
+  })
+  await browser.close();
+  return result
+  } catch (error) {
+  win.webContents.send('dataError',{error,titulo:'Error de busqueda'})
+      
+  }
 };
 
 const infoAnime = async(url)=>{
@@ -214,6 +241,85 @@ const descargarEpisodio = async (urlBusqueda) => {
     console.log(error)   
   }
 };
+const verCapitulo = async (urlBusqueda) => {
+  try {
+  // win.webContents.send('dataServe',{ progress:'', fileName:urlBusqueda ,estado:true,titulo:'Obteniendo datos'})
+    const browser = await puppeteer.launch({headless:'new'})
+    const page = await browser.newPage();
+    await page.goto(urlBusqueda);  
+    const result = await page.evaluate(async()=>{
+      const resultadoJSON = {};
+      const titulo =  document.querySelector('h1').innerText;
+      const capitulo =  document.querySelector('#guardar-capitulo').getAttribute('data-capitulo');
+
+      resultadoJSON.titulo = titulo
+      resultadoJSON.capitulo = capitulo
+      return resultadoJSON
+    })
+    await browser.close();
+    return result
+  }catch (error) {
+    console.log(error)   
+  }
+};
+
+const animeIndex = async () => {
+  try {
+    const browser = await puppeteer.launch({headless:'new'})
+    const page = await browser.newPage();
+    await page.goto('https://jkanime.net/');  
+    await page.waitForSelector('section.destacados.spad .col-lg-4');
+    const result = await page.evaluate(async()=>{
+      document.querySelector('.guardados').remove();
+      const trending = document.querySelectorAll('.trending__anime .anime__item')
+      const trendList =[...trending].map((trend)=>{
+        const link = trend.querySelector('a').getAttribute('href')
+        const img = trend.querySelector('.anime__item__pic.set-bg').getAttribute('data-setbg')
+        const titulo = trend.querySelector('h5 a').innerText
+        const estado = trend.querySelector('li').innerText;
+        const tipo = trend.querySelector('li.anime').innerText;
+        return {link,img,titulo,estado,tipo}
+      })
+      const resultadoJSON = {};
+      const destacados =  document.querySelector('section.destacados.spad');
+      const top1 =  destacados.querySelector('.col-lg-4 a');
+      const top1Titulo= top1.querySelector('.tituloblanco').innerText;
+      const top1Link= top1.getAttribute('href')
+      const top1Img= top1.querySelector('.anime__item__pic.set-bg').getAttribute('data-setbg')
+      const res3 = destacados.querySelectorAll('.col-lg-8 .row .col-lg-4')
+      const res6 = destacados.querySelectorAll('.col-lg-8 .row .col-lg-2')
+
+      const items = [...res3].map((item)=>{
+          const etiqueta = item.querySelector('a')
+          const link = etiqueta.getAttribute('href')
+          const imagen = etiqueta.querySelector('.anime__item__pic__fila4.set-bg').getAttribute('data-setbg')
+          const top = etiqueta.querySelector('.top3').innerText
+          const titulo = etiqueta.querySelector('.tituloblanco ').innerText
+          return {link,img:imagen,titulo,top}
+      })
+      const items6 = [...res6].map((item)=>{
+        const etiqueta = item.querySelector('a')
+        const link = etiqueta.getAttribute('href')
+        const imagen = etiqueta.querySelector('.anime__item__pic__fila4.set-bg').getAttribute('data-setbg')
+        const top = etiqueta.querySelector('.top6').innerText
+        const titulo = etiqueta.querySelector('.tituloblanco ').innerText
+        return {link,img:imagen,titulo,top}
+    })
+    
+
+      resultadoJSON.top6=items6
+      resultadoJSON.top3=items
+      resultadoJSON.top1={link:top1Link,titulo:top1Titulo,img:top1Img, top:"1"}
+      resultadoJSON.trend=trendList
+      return resultadoJSON
+    })
+    await browser.close();
+    return result
+  }catch (error) {
+    console.log(error)   
+  }
+};
+
 
 // Función para descargar un video
 async function downloadVideo(videoUrl, savePath) {
@@ -228,9 +334,20 @@ async function downloadVideo(videoUrl, savePath) {
   });
 
 }
+expressApp.post('/api/inicio', async(req, res) => {
+  const datos = await animeIndex()
+  res.json(datos);
+});
+
+
 expressApp.post('/api/buscar', async(req, res) => {
   const {valor} = req.body;
   const datos = await animeList(valor)
+  res.json(datos);
+});
+expressApp.post('/api/verCap', async(req, res) => {
+  const {valor} = req.body;
+  const datos = await verCapitulo(valor)
   res.json(datos);
 });
 

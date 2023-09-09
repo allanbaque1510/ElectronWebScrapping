@@ -13,13 +13,94 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  document.addEventListener("DOMContentLoaded", function() {
+    datosInicio()
 
+});
+
+const datosInicio = () =>{
+  document.getElementById('listItems').classList.remove('showInfoResult')
+  const divInfo = document.getElementById('informacion');
+  divInfo.innerHTML =''
+  document.getElementById('resultados').innerHTML='Cargando datos, espere por favor....'
+  fetch(`http://localhost:3000/api/inicio`,{
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data)
+      const contenidoHTML =`
+      <h2 style='width:100%;'>Top Animes!!!</h2>
+      <div class='col1'>
+        <div class='top1' onclick="infoAnime('${data.top1.link}')">
+          <span>${data.top1.top}</span>
+          <p>${data.top1.titulo}</p>
+          <img src='${data.top1.img}'>
+        </div>
+      </div>
+      <div class='topAnimes'>
+      
+      <div class='col2'>
+      ${data.top3.map((item)=>{
+       return `<div class='top top3' onclick="infoAnime('${item.link}')">
+          <span>${item.top}</span>
+          <p>${item.titulo}</p>
+          <img src='${item.img}'>
+        </div>
+        `
+      }).join('')}
+      </div>
+      <div class='col3'>
+        ${data.top6.map((item)=>{
+          return ` <div class='top top6' onclick="infoAnime('${item.link}')">
+            <span>${item.top}</span>
+            <p>${item.titulo}</p>
+            <img src='${item.img}'>
+          </div>
+          `
+        }).join('')}
+      </div>
+      </div>
+      <div class='trendList'>
+        <h2 style='width:100%'>Ultimas Novedades</h2>
+        ${
+          data.trend.map((objeto) => {
+            return `
+              <div class='item' >
+                <button class='tarjetaBtn' onclick="infoAnime('${objeto.link}')">
+                <div class='contImg'>
+                  <img src="${objeto.img}" alt="${objeto.titulo}">
+                </div>
+                <div class='datos'>
+                  <span class='tipo'>${objeto.tipo}</span>
+                  <span class='estado'>${objeto.estado}</span>
+                  <p>${objeto.titulo}</p>
+                </div>
+                </button>
+              </div>
+            `;
+          }).join('') // Une las cadenas HTML en una sola
+  
+        }
+        
+      </div>
+
+      ` 
+      document.getElementById('resultados').innerHTML=contenidoHTML
+    })
+
+
+
+
+}
   const prueba = (id) => {
     document.getElementById('navegacion').classList.remove('ocultar')
     document.getElementById('listItems').classList.remove('showInfoResult')
     const divInfo = document.getElementById('informacion');
-    const contenidoHTML =``
-    divInfo.innerHTML =contenidoHTML
+    divInfo.innerHTML =''
       Swal.fire({
         title: 'Buscando lista de animes',
         allowOutsideClick:false,
@@ -95,19 +176,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultadosDiv = document.getElementById('divPantalla');
     console.log(url)
     resultadosDiv.innerHTML='Cargando pantalla....'
-    fetch(`http://localhost:3000/api/verEpisodio`,{
+    fetch(`http://localhost:3000/api/verCap`,{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({valor:url}),
     }).then((response) => response.json())
-    .then((data) => {
+    .then(async(data) => {
+      const capituloResponse = await fetch(`https://jkanime.net/ajax/download_episode/${data.capitulo}`, {
+        method: 'GET'
+      });
+
+      const capituloData = await capituloResponse.json();
       const contenidoHTML = `
         <div>
           <h3>${data.titulo}</h3>
           <video class='video' controls autoplay name="media" crossorigin="anonymous" >
-            <source src='${data.video}' type='video/mp4'>
+            <source src='${capituloData.url}' type='video/mp4'>
           </video>
         </div>
       `
@@ -140,11 +226,11 @@ document.addEventListener('DOMContentLoaded', () => {
                   </div>`
             }).join('')}
             </div>
-            <div id='divPantalla' class='watch'>
             <h3 id='tituloLista'>${tituloAnimeTexto}</h3>
             <button class='btnDescargar' onclick=descargarDatos('${data.episodios.map((epi)=>{
               return `${epi.link}`
             })}')>Descargar lista de capitulos <img width="25" height="25" src="https://img.icons8.com/metro/26/FFFFFF/download--v1.png" alt="download--v1"></button>
+            <div id='divPantalla' class='watch'>
             </div>
       </div>
       `

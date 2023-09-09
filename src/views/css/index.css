@@ -72,16 +72,29 @@ body::-webkit-scrollbar-thumb{
     padding-block: 2px;
     padding-inline: 8px;
 }
-#miFormulario{
-    width: 100%;
-    height: 40px;
+.botonesW button{
+    background-color: transparent;
+    border: none;
+    margin-inline: 3px;
+    padding: 0%;
+}
+.formulario{
     display: flex;
+    z-index: 10;
     position: fixed;
-    justify-content: center; /* Centra horizontalmente */
+    width: 100%;
+    justify-content:space-between;   
     align-items: center;
     background: rgb(22,20,41);
     background: linear-gradient(0deg, rgba(22,20,41,1) 0%, rgba(22,20,41,1) 33%, rgba(23, 21, 43, 0.99) 56%, rgb(22, 24, 54) 100%);
+
 }
+#miFormulario{
+    height: 40px;
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center;
+   }
 .showInfoResult{
     width: 60%;
 }
@@ -122,9 +135,132 @@ body::-webkit-scrollbar-thumb{
     display: flex;
     flex-direction: column;
 }
+.col1{
+    width: 25%;
+}
+.col2{
+    justify-content: space-between;
+    margin-bottom: 20px;
+    margin-left: 5px;
+    display: flex;
+}
+.col3{
+    display: flex;
+    margin-left: 5px;
+
+    justify-content: space-between;
+}
+.top{
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    justify-content: center; 
+}
+.top img{
+    width: 100%;
+    object-fit: cover;
+}
+.top p{
+    display: flex;
+    position: absolute;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    font-weight: 600;
+    background-color: rgba(0, 0, 0, 0.589);
+    color: white;
+    overflow: hidden; /* Oculta cualquier contenido que se desborde */
+    word-wrap: break-word;
+}
+.top span{
+    font-size: 30px;
+    padding-inline: 10px;
+    border-radius: 10px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: white;
+}
+.topAnimes{
+    display: flex;
+    flex-direction: column;
+    width: 75%;
+}
+.top3{
+    width: 32%;
+    border-radius: 20px;
+    max-height: 150px;
+}
+.top3 p{
+    height: 28%;
+    bottom: -17px;
+}
+.top3 span{
+    background-color: rgb(42, 207, 111);
+}
+
+.top6{
+    width: 16%;
+    border-radius: 20px;
+    max-height: 150px;
+}
+.top6 p{
+    height: 28%;
+    bottom: -17px;
+}
+.top6 span{
+    background-color: rgb(42, 207, 111);
+}
+.contentIndex{
+    width: 99vw;
+    background-color: rgb(255, 255, 255);
+}
 .informacion{
     flex: 1;
 }
+.top1{
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    border-radius: 30px;
+    overflow: hidden;
+    height: 320px;
+}
+.top1 img{
+    width: 100%;
+    object-fit: cover; /* Ajusta el tamaño de la imagen para que cubra completamente el contenedor */
+    
+}
+.top1 p{
+    display: flex;
+    position: absolute;
+    text-align: center;
+    bottom: -25px;
+    font-size: 25px;
+    height: 20%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    background-color: rgba(0, 0, 0, 0.589);
+    color: white;
+    overflow: hidden; /* Oculta cualquier contenido que se desborde */
+    word-wrap: break-word;
+}
+.top1 span{
+    font-size: 30px;
+    padding-inline: 10px;
+    border-radius: 10px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgb(255, 166, 0);
+    color: white;
+}
+
 
 .contenidoInfo{
     height: calc(100% - 40px) ;
@@ -146,11 +282,16 @@ body::-webkit-scrollbar-thumb{
 .video{
     width: 100%;
 }
-
+.trendList{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; 
+    overflow: hidden;   
+}
 #resultados{
     display: flex;
     flex-wrap: wrap;
-    justify-items: center;
+    justify-content: space-between; 
     overflow: hidden;
 }
 #navegacion{
